@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 
-plt.show()  # 新增此行代码
+
 import numpy as np
 import glob
 
@@ -54,4 +54,89 @@ def load_img(path, label):
     # 归一化
     image = image / 255
     return image, label
+
+
+# 根据需求读取线程数
+AUTOTUEN = tf.data.experimental.AUTOTUNE
+train_ds = train_ds.map(load_img, num_parallel_calls=AUTOTUEN)
+test_ds = test_ds.map(load_img, num_parallel_calls=AUTOTUEN)
+print(train_ds)
 #
+BATCH_SIZE = 32
+# 缓存区设置300
+train_ds = train_ds.repeat().shuffle(300).batch(BATCH_SIZE)
+print("**缓存区设置300***")
+print(train_ds)
+test_ds = test_ds.batch(BATCH_SIZE)
+# 建立模型
+model = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(64, (3, 3), input_shape=(256, 256, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPooling2D(),
+    tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.GlobalAveragePooling2D(),
+    tf.keras.layers.Dense(1024, activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Dense(200)
+])
+
+model.summary()
+
+model.compile(optimizer=tf.keras.optimizers.Adam(0.0001),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['acc']
+              )
+# 训练图片数量
+train_count = len(train_path)
+# 测试图片数量
+test_count = len(test_path)
+# 训练轮数
+steps_per_epoch = train_count // BATCH_SIZE
+print(steps_per_epoch)
+# 测试轮数
+validation_steps = test_count // BATCH_SIZE
+print(validation_steps)
+
+# 训练过程
+print("训练过程")
+history = model.fit(
+    x=train_ds, epochs=10,
+    steps_per_epoch=steps_per_epoch,
+    validation_data=test_ds,
+    validation_steps=validation_steps
+)
+print("可视化训练过程")
+# 可视化训练过程
+history.history.keys()
+
+#
+plt.plot(history.epoch, history.history.get('acc'), label='acc')
+plt.plot(history.epoch, history.history.get('val_acc'), label='val_acc')
+plt.legend()
+#
+plt.plot(history.epoch, history.history.get('loss'), label='loss')
+plt.plot(history.epoch, history.history.get('val_loss'), label='val_loss')
+plt.legend()
+plt.show()
