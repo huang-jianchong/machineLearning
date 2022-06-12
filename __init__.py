@@ -54,4 +54,4 @@ def load_img(path, label):
     # 归一化
     image = image / 255
     return image, label
-
+#
