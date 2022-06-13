@@ -131,12 +131,36 @@ print("可视化训练过程")
 # 可视化训练过程
 history.history.keys()
 
-#
+#绘制成功率
 plt.plot(history.epoch, history.history.get('acc'), label='acc')
 plt.plot(history.epoch, history.history.get('val_acc'), label='val_acc')
 plt.legend()
-#
+#绘制失败率
 plt.plot(history.epoch, history.history.get('loss'), label='loss')
 plt.plot(history.epoch, history.history.get('val_loss'), label='val_loss')
 plt.legend()
+plt.show()
+
+# 记录准确率和损失值
+history_dict = history.history
+train_loss = history_dict["loss"]
+train_accuracy = history_dict["acc"]
+val_loss = history_dict["val_loss"]
+val_accuracy = history_dict["val_acc"]
+
+# 绘制损失值
+plt.figure()
+plt.plot(range(epochs), train_loss, label='loss')
+plt.plot(range(epochs), val_loss, label='val_loss')
+plt.legend()
+plt.xlabel('epochs')
+plt.ylabel('loss')
+
+# 绘制准确率
+plt.figure()
+plt.plot(range(epochs), train_accuracy, label='acc')
+plt.plot(range(epochs), val_accuracy, label='val_acc')
+plt.legend()
+plt.xlabel('epochs')
+plt.ylabel('acc')
 plt.show()
