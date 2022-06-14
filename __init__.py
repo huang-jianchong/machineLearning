@@ -2,7 +2,6 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 
-
 import numpy as np
 import glob
 
@@ -61,7 +60,7 @@ AUTOTUEN = tf.data.experimental.AUTOTUNE
 train_ds = train_ds.map(load_img, num_parallel_calls=AUTOTUEN)
 test_ds = test_ds.map(load_img, num_parallel_calls=AUTOTUEN)
 print(train_ds)
-#
+# 图片一次加载32张
 BATCH_SIZE = 32
 # 缓存区设置300
 train_ds = train_ds.repeat().shuffle(300).batch(BATCH_SIZE)
@@ -70,40 +69,57 @@ print(train_ds)
 test_ds = test_ds.batch(BATCH_SIZE)
 # 建立模型
 model = tf.keras.Sequential([
+    # 卷积层，该卷积层输出64个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(64, (3, 3), input_shape=(256, 256, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 卷积层，该卷积层输出64个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 池化层
     tf.keras.layers.MaxPooling2D(),
+    # 卷积层，该卷积层输出128个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 卷积层，该卷积层输出128个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 池化层
     tf.keras.layers.MaxPooling2D(),
+    # 卷积层，该卷积层输出256个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 卷积层，该卷积层输出256个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 池化层
     tf.keras.layers.MaxPooling2D(),
+    # 卷积层，该卷积层输出512个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 卷积层，该卷积层输出512个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 池化层
     tf.keras.layers.MaxPooling2D(),
+    # 卷积层，该卷积层输出512个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 卷积层，该卷积层输出512个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    # 卷积层，该卷积层输出512个通道，卷积核为3*3，激活函数relu
     tf.keras.layers.Conv2D(512, (3, 3), activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.GlobalAveragePooling2D(),
+    #拉伸
     tf.keras.layers.Dense(1024, activation='relu'),
     tf.keras.layers.BatchNormalization(),
+    #分类为200
     tf.keras.layers.Dense(200)
 ])
-
+#输出模型信息
 model.summary()
-
+#指明训练参数
 model.compile(optimizer=tf.keras.optimizers.Adam(0.0001),
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['acc']
@@ -131,11 +147,11 @@ print("可视化训练过程")
 # 可视化训练过程
 history.history.keys()
 
-#绘制成功率
+# 绘制成功率
 plt.plot(history.epoch, history.history.get('acc'), label='acc')
 plt.plot(history.epoch, history.history.get('val_acc'), label='val_acc')
 plt.legend()
-#绘制失败率
+# 绘制失败率
 plt.plot(history.epoch, history.history.get('loss'), label='loss')
 plt.plot(history.epoch, history.history.get('val_loss'), label='val_loss')
 plt.legend()
@@ -150,16 +166,16 @@ val_accuracy = history_dict["val_acc"]
 
 # 绘制损失值
 plt.figure()
-plt.plot(range(epochs), train_loss, label='loss')
-plt.plot(range(epochs), val_loss, label='val_loss')
+plt.plot(range(steps_per_epoch), train_loss, label='loss')
+plt.plot(range(validation_steps), val_loss, label='val_loss')
 plt.legend()
 plt.xlabel('epochs')
 plt.ylabel('loss')
 
 # 绘制准确率
 plt.figure()
-plt.plot(range(epochs), train_accuracy, label='acc')
-plt.plot(range(epochs), val_accuracy, label='val_acc')
+plt.plot(range(steps_per_epoch), train_accuracy, label='acc')
+plt.plot(range(validation_steps), val_accuracy, label='val_acc')
 plt.legend()
 plt.xlabel('epochs')
 plt.ylabel('acc')
