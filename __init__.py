@@ -164,19 +164,3 @@ train_accuracy = history_dict["acc"]
 val_loss = history_dict["val_loss"]
 val_accuracy = history_dict["val_acc"]
 
-# 绘制损失值
-plt.figure()
-plt.plot(range(steps_per_epoch), train_loss, label='loss')
-plt.plot(range(validation_steps), val_loss, label='val_loss')
-plt.legend()
-plt.xlabel('epochs')
-plt.ylabel('loss')
-
-# 绘制准确率
-plt.figure()
-plt.plot(range(steps_per_epoch), train_accuracy, label='acc')
-plt.plot(range(validation_steps), val_accuracy, label='val_acc')
-plt.legend()
-plt.xlabel('epochs')
-plt.ylabel('acc')
-plt.show()
